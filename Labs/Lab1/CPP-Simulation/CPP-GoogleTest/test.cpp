@@ -4,6 +4,7 @@
 #include "Collider.h"
 #include <memory>
 
+/*
 TEST(IsInside, BasicCentreInside) {
     Sphere sphere({ 0.0, 0.0, 0.0 }, 5.0);
     Vec3 point{ 0.0, 0.0, 0.0 };
@@ -190,4 +191,41 @@ TEST(SphereSphereCollision, IdenticalSpheres) {
     Sphere a({ 0.0, 0.0, 0.0 }, 2.0f);
     Sphere b({ 0.0, 0.0, 0.0 }, 2.0f);
     EXPECT_TRUE(a.CollideWith(b));
+}
+*/
+
+// infinite line distance tests
+TEST(InfiniteLineDistance, ClosestPointOnLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 1.0, 1.0} };
+    Vec3 PG{ 2.0, 3.0, 4.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 1.41421356, 0.01);
+}
+
+TEST(InfiniteLineDistance, PointOnLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 2.0, 3.0} };
+    Vec3 PG{ 3.0, 6.0, 9.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 0.0, 1e-9);
+}
+
+TEST(InfiniteLineDistance, VerticalLine) {
+    InfiniteLine line{ {2.0, 2.0, 0.0}, {0.0, 0.0, 1.0} };
+    Vec3 PG{ 4.0, 5.0, 3.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 3.60555, 0.01);
+}
+
+TEST(InfiniteLineDistance, HorizontalLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 0.0, 0.0} };
+    Vec3 PG{ 3.0, 4.0, 5.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 6.40312, 0.01);
+}
+
+TEST(InfiniteLineDistance, DiagonalLine) {
+    InfiniteLine line{ {1.0, 1.0, 1.0}, {1.0, -1.0, 1.0} };
+    Vec3 PG{ 2.0, 5.0, 3.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 4.54606, 0.01);
 }

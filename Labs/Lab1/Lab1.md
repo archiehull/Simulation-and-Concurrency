@@ -94,24 +94,97 @@ TEST(SphereSphereCollision, IdenticalSpheres) {
 [  PASSED  ] 28 tests.
 ```
 
-
-
-**Sample output:**
-
-
 **Reflection:**
-
-
-**Questions:**
+All tests pass as expected, using epsilon to account for floating point errors, although tests still passed without epsilon.
 
 ##
-### Q1. 
+### Q2. Closest Distance from a Point to a Line
 
 **Question:**
 
 
 **Solution:**
 
+```cpp
+	static Vec3 ClosestPointOnInfiniteLine(const InfiniteLine& line, const Vec3& PG)
+	{
+		Vec3 PL = line.point;
+		Vec3 DL = line.direction;
+
+		// find the vector from PL to PG
+		Vec3 PLPG = PG - PL;
+
+		// find the projection scalar m
+		double m = Dot(PLPG, DL) / Dot(DL, DL);
+
+		// multiply by DL to find the point on the line
+		return PL + (DL * m);
+	}
+
+	static double ShortestDistanceToLine(const InfiniteLine& line, const Vec3& PG)
+	{
+		Vec3 PA = ClosestPointOnInfiniteLine(line, PG);
+
+		return Length(PG - PA);
+	}
+```
+
+```cpp
+TEST(InfiniteLineDistance, ClosestPointOnLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 1.0, 1.0} };
+    Vec3 PG{ 2.0, 3.0, 4.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 1.41421356, 0.01);
+}
+
+TEST(InfiniteLineDistance, PointOnLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 2.0, 3.0} };
+    Vec3 PG{ 3.0, 6.0, 9.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 0.0, 1e-9);
+}
+
+TEST(InfiniteLineDistance, VerticalLine) {
+    InfiniteLine line{ {2.0, 2.0, 0.0}, {0.0, 0.0, 1.0} };
+    Vec3 PG{ 4.0, 5.0, 3.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 3.60555, 0.01);
+}
+
+TEST(InfiniteLineDistance, HorizontalLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 0.0, 0.0} };
+    Vec3 PG{ 3.0, 4.0, 5.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 6.40312, 0.01);
+}
+
+TEST(InfiniteLineDistance, DiagonalLine) {
+    InfiniteLine line{ {1.0, 1.0, 1.0}, {1.0, -1.0, 1.0} };
+    Vec3 PG{ 2.0, 5.0, 3.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 4.54606, 0.01);
+}
+```
+
+
+```sh
+[----------] 5 tests from InfiniteLineDistance
+[ RUN      ] InfiniteLineDistance.ClosestPointOnLine
+[       OK ] InfiniteLineDistance.ClosestPointOnLine (1 ms)
+[ RUN      ] InfiniteLineDistance.PointOnLine
+[       OK ] InfiniteLineDistance.PointOnLine (0 ms)
+[ RUN      ] InfiniteLineDistance.VerticalLine
+[       OK ] InfiniteLineDistance.VerticalLine (0 ms)
+[ RUN      ] InfiniteLineDistance.HorizontalLine
+[       OK ] InfiniteLineDistance.HorizontalLine (0 ms)
+[ RUN      ] InfiniteLineDistance.DiagonalLine
+[       OK ] InfiniteLineDistance.DiagonalLine (0 ms)
+[----------] 5 tests from InfiniteLineDistance (3 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 1 test case ran. (4 ms total)
+[  PASSED  ] 5 tests.
+```
 
 **Sample output:**
 

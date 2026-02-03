@@ -32,6 +32,28 @@ public:
 		return DistanceSqToPoint(other.m_position) <= (rSum * rSum) + EPS;
 	}
 
+	static Vec3 ClosestPointOnInfiniteLine(const InfiniteLine& line, const Vec3& PG)
+	{
+		Vec3 PL = line.point;
+		Vec3 DL = line.direction;
+
+		// find the vector from PL to PG
+		Vec3 PLPG = PG - PL;
+
+		// find the projection scalar m
+		double m = Dot(PLPG, DL) / Dot(DL, DL);
+
+		// multiply by DL to find the point on the line
+		return PL + (DL * m);
+	}
+
+	static double ShortestDistanceToLine(const InfiniteLine& line, const Vec3& PG)
+	{
+		Vec3 PA = ClosestPointOnInfiniteLine(line, PG);
+
+		return Length(PG - PA);
+	}
+
 	float m_radius;
 
 private:
