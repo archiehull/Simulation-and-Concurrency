@@ -25,6 +25,13 @@ public:
 		return LengthSq(m_position - closest) <= rSq + EPS;
 	}
 
+	// infinite-line (unbounded) sphere intersection test
+	bool Intersects(const InfiniteLine& line) const
+	{
+		double dist = ShortestDistanceToLine(line, m_position);
+		return dist <= static_cast<double>(m_radius) + EPS;
+	}
+
 	// Sphere-sphere collision: true if distance between centers <= sum of radii
 	bool CollideWith(const Sphere& other) const
 	{

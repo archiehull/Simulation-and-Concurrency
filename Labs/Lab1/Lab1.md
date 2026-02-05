@@ -1,6 +1,7 @@
 # 700106 / 700120 Lab Book
 
-## Week  - Lab 
+## Week 1 - Lab A
+05/02 
 ### Q1. Sphere-Sphere Intersection Test
 
 **Question:**

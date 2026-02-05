@@ -4,7 +4,7 @@
 #include "Collider.h"
 #include <memory>
 
-/*
+
 TEST(IsInside, BasicCentreInside) {
     Sphere sphere({ 0.0, 0.0, 0.0 }, 5.0);
     Vec3 point{ 0.0, 0.0, 0.0 };
@@ -192,7 +192,7 @@ TEST(SphereSphereCollision, IdenticalSpheres) {
     Sphere b({ 0.0, 0.0, 0.0 }, 2.0f);
     EXPECT_TRUE(a.CollideWith(b));
 }
-*/
+
 
 // infinite line distance tests
 TEST(InfiniteLineDistance, ClosestPointOnLine) {
@@ -228,4 +228,33 @@ TEST(InfiniteLineDistance, DiagonalLine) {
     Vec3 PG{ 2.0, 5.0, 3.0 };
     double distance = Sphere::ShortestDistanceToLine(line, PG);
     EXPECT_NEAR(distance, 4.54606, 0.01);
+}
+
+TEST(Intersects_InfiniteLine_NoEps, NoIntersection_CentreAtOrigin) {
+    Sphere s({ 0.0, 0.0, 0.0 }, 3.0f);
+    InfiniteLine line{ {5.0, 5.0, 5.0}, {1.0, 0.0, 0.0} };
+    double dist = Sphere::ShortestDistanceToLine(line, s.Position());
+    // Expect distance strictly greater than radius (no EPS)
+    EXPECT_GT(dist, static_cast<double>(s.m_radius));
+}
+
+TEST(Intersects_InfiniteLine_NoEps, PassesThroughSphere_CentreAtSphere) {
+    Sphere s({ 10.0, 0.0, 0.0 }, 5.0f);
+    InfiniteLine line{ {10.0, 0.0, 0.0}, {-1.0, 0.0, 0.0} }; // line passes through sphere center
+    double dist = Sphere::ShortestDistanceToLine(line, s.Position());
+    EXPECT_LE(dist, static_cast<double>(s.m_radius));
+}
+
+TEST(Intersects_InfiniteLine_NoEps, LineStartsInsideSphere) {
+    Sphere s({ 2.0, 2.0, 2.0 }, 5.0f);
+    InfiniteLine line{ {3.0, 2.0, 2.0}, {1.0, 0.0, 0.0} }; // start point lies within sphere
+    double dist = Sphere::ShortestDistanceToLine(line, s.Position());
+    EXPECT_LE(dist, static_cast<double>(s.m_radius));
+}
+
+TEST(Intersects_InfiniteLine_NoEps, LinePassesThroughSphereCenter) {
+    Sphere s({ 0.0, 0.0, 0.0 }, 3.0f);
+    InfiniteLine line{ {-5.0, 0.0, 0.0}, {1.0, 0.0, 0.0} }; // line goes through sphere center
+    double dist = Sphere::ShortestDistanceToLine(line, s.Position());
+    EXPECT_LE(dist, static_cast<double>(s.m_radius));
 }
