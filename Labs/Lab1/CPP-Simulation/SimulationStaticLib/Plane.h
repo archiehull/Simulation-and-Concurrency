@@ -1,5 +1,6 @@
 #pragma once
 #include "Collider.h"
+#include "Sphere.h"
 #include <cmath>
 
 class Plane : public Collider
@@ -32,6 +33,12 @@ public:
 
 		// intersection occurs if signs differ
 		return (da < 0.0 && db > 0.0) || (da > 0.0 && db < 0.0);
+	}
+
+	bool Intersects(const Sphere& sphere) const
+	{
+		double dist = DistanceFromPoint(sphere.Position());
+		return dist <= static_cast<double>(sphere.m_radius) + 1e-9;
 	}
 
 	// Returns the shortest distance from a general point to the plane.

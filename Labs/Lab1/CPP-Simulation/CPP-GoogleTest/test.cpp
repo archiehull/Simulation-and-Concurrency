@@ -318,3 +318,44 @@ TEST(PlaneDistance, RandomDirection) {
     // Distance is abs(-0.707) = 0.707
     EXPECT_NEAR(p.DistanceFromPoint(point), 0.7071, 0.01);
 }
+
+// Sphere-plane collision tests
+TEST(SpherePlaneCollision, NoIntersection_Above) {
+    Plane p({ 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }); // Plane y=0
+    Sphere s({ 0.0, 5.0, 0.0 }, 1.0f);             // Sphere at y=5, radius=1
+
+    // Distance (5) > Radius (1) -> No Collision
+    EXPECT_FALSE(p.Intersects(s));
+}
+
+TEST(SpherePlaneCollision, Intersection_Crossing) {
+    Plane p({ 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+    Sphere s({ 0.0, 0.5, 0.0 }, 1.0f); // Sphere center at y=0.5
+
+    // Distance (0.5) < Radius (1) -> Collision
+    EXPECT_TRUE(p.Intersects(s));
+}
+
+TEST(SpherePlaneCollision, Intersection_Touching) {
+    Plane p({ 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+    Sphere s({ 0.0, 1.0, 0.0 }, 1.0f); // Sphere bottom touches plane
+
+    // Distance (1.0) == Radius (1.0) -> Collision
+    EXPECT_TRUE(p.Intersects(s));
+}
+
+TEST(SpherePlaneCollision, Intersection_Bisected) {
+    Plane p({ 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+    Sphere s({ 0.0, 0.0, 0.0 }, 1.0f); // Sphere center ON the plane
+
+    // Distance (0) < Radius (1) -> Collision
+    EXPECT_TRUE(p.Intersects(s));
+}
+
+TEST(SpherePlaneCollision, NoIntersection_Below) {
+    Plane p({ 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+    Sphere s({ 0.0, -5.0, 0.0 }, 1.0f); // Sphere at y=-5
+
+    // Distance (|-5|) = 5 > Radius (1) -> No Collision
+    EXPECT_FALSE(p.Intersects(s));
+}

@@ -96,7 +96,9 @@ TEST(SphereSphereCollision, IdenticalSpheres) {
 ```
 
 **Reflection:**
-All tests pass as expected and now prove whether a larger sphere correctly "collides" with a smaller one inside it, including edge cases where the spheres are identical.
+To optimise the collision check, I avoided expensive square root operations by comparing the squared distance between sphere centres against the squared sum of their radii, using a helper function DistanceSqToPoint. 
+
+My tests covered standard overlaps and critical edge cases, including fully contained spheres, identical spheres, and large coordinate values to verify floating-point precision at scale.
 
 ##
 ### Q2. Closest Distance from a Point to a Line
@@ -189,7 +191,9 @@ TEST(InfiniteLineDistance, DiagonalLine) {
 
 **Reflection:**
 
-The suite of GoogleTests confirms the logic for aligning lines with major axis and arbitrary diagonals.
+I calculated the closest point on an infinite line by projecting the vector from the line's origin to the target point onto the line's direction vector. 
+
+My tests confirmed this method works for both axis-aligned and diagonal lines, and correctly returns a distance of zero (within epsilon) when the point lies exactly on the line.
 
 
 ##
@@ -277,7 +281,9 @@ TEST(Intersects_InfiniteLine_NoEps, LinePassesThroughSphereCenter) {
 
 **Reflection:**
 
-The test suite has been extended to verify different geometric relationships - including the intersection of a line through the centre of a sphere, if there is no intersection, or if the origin of the line exists within the sphere.
+I solved the sphere-line intersection by reusing the point-to-line distance logic; if the shortest distance from the sphere's centre to the line is less than or equal to the radius, they intersect. 
+
+I expanded the test suite to verify lines passing through the centre, lines starting inside the sphere, and lines that clearly miss the volume to ensure the logic holds for all geometric relationships.
 
 ##
 ### Q4. Closest Distance from a Point to a Plane
@@ -313,23 +319,33 @@ double DistanceFromPoint(const Vec3& point) const
 
 
 **Reflection:**
-My tests cover points on both sides of the plane (positive and negative signed distance), points exactly on the plane, and planes with non-unit normal vectors in the constructor (to ensure normalisation works).
+For point-to-plane distance, I utilised the stored plane equation components. The distance is the absolute value of the dot product between the plane's normal and the point, plus the constant $d$, which relies on the normal being normalised during construction. 
 
-**Questions:**
+I tested points on positive and negative sides, as well as on the plane itself, to ensure the signed distance was handled correctly.
 
 ##
-### Q. 
+### Q5. Sphere to Plane Collision
 
 **Question:**
-
+Determine if a Sphere intersects with a Plane.
 
 **Solution:**
+ince I had already implemented the logic to find the closest distance from a point to a plane in Q4, I could reuse that for this collision test. A sphere intersects a plane if the distance from the sphere's center to the plane is less than or equal to the sphere's radius.
 
+I added an Intersects method to the Plane class that takes a Sphere as an argument.
 
-**Sample output:**
-
+```cpp
+bool Intersects(const Sphere& sphere) const
+{
+    // Reuse the distance calculation
+    double dist = DistanceFromPoint(sphere.Position());
+    
+    // Check if distance is within the radius (allowing for small epsilon)
+    return dist <= static_cast<double>(sphere.m_radius) + 1e-9;
+}
+```
 
 **Reflection:**
+Leveraging the previous distance logic, I implemented sphere-plane intersection by checking if the point-to-plane distance is less than the sphere's radius. 
 
-
-**Questions:**
+I designed specific unit tests to verify various states: distinct gaps, clear intersections, boundary cases where the sphere touches the surface, and bisected spheres where the centre lies on the plane.
