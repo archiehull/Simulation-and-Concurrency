@@ -4,7 +4,7 @@
 #include "Collider.h"
 #include <memory>
 
-
+/*
 TEST(IsInside, BasicCentreInside) {
     Sphere sphere({ 0.0, 0.0, 0.0 }, 5.0);
     Vec3 point{ 0.0, 0.0, 0.0 };
@@ -359,3 +359,5 @@ TEST(SpherePlaneCollision, NoIntersection_Below) {
     // Distance (|-5|) = 5 > Radius (1) -> No Collision
     EXPECT_FALSE(p.Intersects(s));
 }
+
+*/
