@@ -34,6 +34,12 @@ public:
 		return (da < 0.0 && db > 0.0) || (da > 0.0 && db < 0.0);
 	}
 
+	// Returns the shortest distance from a general point to the plane.
+	double DistanceFromPoint(const Vec3& point) const
+	{
+		return std::abs(Dot(m_normal, point) + m_d);
+	}
+
 private:
 	static void Normalize(Vec3& v)
 	{

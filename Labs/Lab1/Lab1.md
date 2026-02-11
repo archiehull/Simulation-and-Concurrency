@@ -96,7 +96,7 @@ TEST(SphereSphereCollision, IdenticalSpheres) {
 ```
 
 **Reflection:**
-All tests pass as expected, using epsilon to account for floating point errors, although tests still passed without epsilon.
+All tests pass as expected and now prove whether a larger sphere correctly "collides" with a smaller one inside it, including edge cases where the spheres are identical.
 
 ##
 ### Q2. Closest Distance from a Point to a Line
@@ -187,16 +187,138 @@ TEST(InfiniteLineDistance, DiagonalLine) {
 [  PASSED  ] 5 tests.
 ```
 
-**Sample output:**
+**Reflection:**
 
+The suite of GoogleTests confirms the logic for aligning lines with major axis and arbitrary diagonals.
+
+
+##
+### Q3. Sphere Line Intersection Test
+
+**Question:**
+Determine if an infinite line intersects a sphere.
+
+**Solution:**
+This solution directly reused the logic from Q2. If the shortest distance from the sphere's center to the line is less than (or equal to) the sphere's radius, they must intersect.
+
+```cpp
+bool Intersects(const InfiniteLine& line) const
+{
+    double dist = ShortestDistanceToLine(line, m_position);
+    return dist <= static_cast<double>(m_radius) + EPS;
+}
+```
+
+```cpp
+TEST(InfiniteLineDistance, ClosestPointOnLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 1.0, 1.0} };
+    Vec3 PG{ 2.0, 3.0, 4.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 1.41421356, 0.01);
+}
+
+TEST(InfiniteLineDistance, PointOnLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 2.0, 3.0} };
+    Vec3 PG{ 3.0, 6.0, 9.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 0.0, 1e-9);
+}
+
+TEST(InfiniteLineDistance, VerticalLine) {
+    InfiniteLine line{ {2.0, 2.0, 0.0}, {0.0, 0.0, 1.0} };
+    Vec3 PG{ 4.0, 5.0, 3.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 3.60555, 0.01);
+}
+
+TEST(InfiniteLineDistance, HorizontalLine) {
+    InfiniteLine line{ {0.0, 0.0, 0.0}, {1.0, 0.0, 0.0} };
+    Vec3 PG{ 3.0, 4.0, 5.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 6.40312, 0.01);
+}
+
+TEST(InfiniteLineDistance, DiagonalLine) {
+    InfiniteLine line{ {1.0, 1.0, 1.0}, {1.0, -1.0, 1.0} };
+    Vec3 PG{ 2.0, 5.0, 3.0 };
+    double distance = Sphere::ShortestDistanceToLine(line, PG);
+    EXPECT_NEAR(distance, 4.54606, 0.01);
+}
+
+TEST(Intersects_InfiniteLine_NoEps, NoIntersection_CentreAtOrigin) {
+    Sphere s({ 0.0, 0.0, 0.0 }, 3.0f);
+    InfiniteLine line{ {5.0, 5.0, 5.0}, {1.0, 0.0, 0.0} };
+    double dist = Sphere::ShortestDistanceToLine(line, s.Position());
+    // Expect distance strictly greater than radius (no EPS)
+    EXPECT_GT(dist, static_cast<double>(s.m_radius));
+}
+
+TEST(Intersects_InfiniteLine_NoEps, PassesThroughSphere_CentreAtSphere) {
+    Sphere s({ 10.0, 0.0, 0.0 }, 5.0f);
+    InfiniteLine line{ {10.0, 0.0, 0.0}, {-1.0, 0.0, 0.0} }; // line passes through sphere center
+    double dist = Sphere::ShortestDistanceToLine(line, s.Position());
+    EXPECT_LE(dist, static_cast<double>(s.m_radius));
+}
+
+TEST(Intersects_InfiniteLine_NoEps, LineStartsInsideSphere) {
+    Sphere s({ 2.0, 2.0, 2.0 }, 5.0f);
+    InfiniteLine line{ {3.0, 2.0, 2.0}, {1.0, 0.0, 0.0} }; // start point lies within sphere
+    double dist = Sphere::ShortestDistanceToLine(line, s.Position());
+    EXPECT_LE(dist, static_cast<double>(s.m_radius));
+}
+
+TEST(Intersects_InfiniteLine_NoEps, LinePassesThroughSphereCenter) {
+    Sphere s({ 0.0, 0.0, 0.0 }, 3.0f);
+    InfiniteLine line{ {-5.0, 0.0, 0.0}, {1.0, 0.0, 0.0} }; // line goes through sphere center
+    double dist = Sphere::ShortestDistanceToLine(line, s.Position());
+    EXPECT_LE(dist, static_cast<double>(s.m_radius));
+}
+```
 
 **Reflection:**
 
+The test suite has been extended to verify different geometric relationships - including the intersection of a line through the centre of a sphere, if there is no intersection, or if the origin of the line exists within the sphere.
+
+##
+### Q4. Closest Distance from a Point to a Plane
+
+**Question:**
+Calculate the shortest distance between a specific point and a plane defined by a point and a normal vector.
+
+**Solution:**
+```cpp
+double DistanceFromPoint(const Vec3& point) const
+{
+    return std::abs(Dot(m_normal, point) + m_d);
+}
+```
+```sh
+[----------] 7 tests from PlaneDistance
+[ RUN      ] PlaneDistance.PointAbovePlane
+[       OK ] PlaneDistance.PointAbovePlane (0 ms)
+[ RUN      ] PlaneDistance.PointBelowPlane
+[       OK ] PlaneDistance.PointBelowPlane (0 ms)
+[ RUN      ] PlaneDistance.PointOnPlane
+[       OK ] PlaneDistance.PointOnPlane (0 ms)
+[ RUN      ] PlaneDistance.PointCloseToPlane
+[       OK ] PlaneDistance.PointCloseToPlane (0 ms)
+[ RUN      ] PlaneDistance.NegativeCoordinates
+[       OK ] PlaneDistance.NegativeCoordinates (0 ms)
+[ RUN      ] PlaneDistance.AlongNormalDirection
+[       OK ] PlaneDistance.AlongNormalDirection (0 ms)
+[ RUN      ] PlaneDistance.RandomDirection
+[       OK ] PlaneDistance.RandomDirection (0 ms)
+[----------] 7 tests from PlaneDistance (2 ms total)
+```
+
+
+**Reflection:**
+My tests cover points on both sides of the plane (positive and negative signed distance), points exactly on the plane, and planes with non-unit normal vectors in the constructor (to ensure normalisation works).
 
 **Questions:**
 
 ##
-### Q1. 
+### Q. 
 
 **Question:**
 
