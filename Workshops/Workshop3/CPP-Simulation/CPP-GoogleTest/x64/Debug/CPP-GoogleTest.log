@@ -1,0 +1,10 @@
+﻿  pch.cpp
+  ColliderTests.cpp
+  PlaneTests.cpp
+  SphereTests.cpp
+  test.cpp
+  Generating Code...
+C:\Users\663073\Workspace\Simulation-and-Concurrency\Workshops\Workshop3\CPP-Simulation\CPP-GoogleTest\SphereTests.cpp(141,17): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file '/SphereTests.cpp')
+  
+  CPP-GoogleTest.vcxproj -> C:\Users\663073\Workspace\Simulation-and-Concurrency\Workshops\Workshop3\CPP-Simulation\x64\Debug\CPP-GoogleTest.exe
