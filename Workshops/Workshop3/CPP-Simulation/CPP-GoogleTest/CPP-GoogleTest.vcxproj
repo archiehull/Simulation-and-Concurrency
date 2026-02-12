@@ -102,7 +102,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ColliderTests.cpp" />
+    <ClCompile Include="CylinderTests.cpp" />
     <ClCompile Include="PlaneTests.cpp" />
+    <ClCompile Include="Source.cpp" />
     <ClCompile Include="SphereTests.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp">
@@ -119,11 +121,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="CylinderTests.xaml">
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
