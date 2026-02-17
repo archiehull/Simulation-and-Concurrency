@@ -66,6 +66,7 @@ public:
 private:
 	static constexpr double EPS = 1e-9;
 
+	// TODO: use vec3 implementation
 	double DistanceSqToPoint(const Vec3& p) const
 	{
 		double dx = p.x - m_position.x;

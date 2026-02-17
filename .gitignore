@@ -2,3 +2,5 @@
 /CPP-Simulation/.vs
 /Labs/Lab1/CPP-Simulation/.vs
 /Workshops/Workshop3/CPP-Simulation/.vs
+*.db
+/Workshops/Workshop4/CPP-Simulation/.vs
