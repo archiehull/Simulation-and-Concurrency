@@ -213,27 +213,51 @@ void PhysicsSystem::Integrate(Registry& registry, float dt) {
 }
 ```
 
-**Sample output:**
-
 
 **Reflection:**
 
 
-**Questions:**
+
 
 ##
-### Q1. 
+### Q4. 
 
 **Question:**
-
+How are collisions detected between different geometric primitives, and how is the resulting motion handled?
 
 **Solution:**
+Collisions are resolved by iterating through all collidable entities and checking for intersections based on their collider types. I used an impulse-based resolution system that conserves momentum and energy.
 
+For Sphere-Sphere collisions, the distance between centers is checked against the sum of radii.
+For Sphere-Plane collisions, the signed distance from the sphere center to the plane is used.
+```cpp
+void PhysicsSystem::ResolveCollisions(Registry& registry) {
+    auto entityCount = registry.GetEntityCount();
+    for (Entity i = 0; i < entityCount; ++i) {
+        for (Entity j = i + 1; j < entityCount; ++j) {
+            if (!IsCollidable(registry, i) || !IsCollidable(registry, j)) continue;
+            
+            auto& t1 = registry.GetComponent<TransformComponent>(i);
+            auto& c1 = registry.GetComponent<ColliderComponent>(i);
+            auto& p1 = registry.GetComponent<PhysicsComponent>(i);
+            // ... (get t2, c2, p2)
 
-**Sample output:**
+            if (c1.type == 0 && c2.type == 0) { // Sphere vs Sphere
+                MovingSphere sphereA(t1.position, c1.radius, p1.velocity, p1.mass, p1.restitution);
+                MovingSphere sphereB(t2.position, c2.radius, p2.velocity, p2.mass, p2.restitution);
+                if (sphereA.sphere.CollideWith(sphereB.sphere)) {
+                    ResolveElasticCollision(sphereA, sphereB);
+                    if (!p1.isStatic) p1.velocity = sphereA.velocity;
+                    if (!p2.isStatic) p2.velocity = sphereB.velocity;
+                    ApplyPositionCorrection(t1, t2, c1.radius, c2.radius, p1.isStatic, p2.isStatic);
+                }
+            }
+        }
+    }
+}
+```
 
 
 **Reflection:**
+Collision resolution requires two steps: velocity reflection and position correction. Without ApplyPositionCorrection, spheres would overlap and get stuck because the discrete timestep doesn't perfectly stop them at the exact moment of contact. For the bonus requirement, I used the plane normal to reflect the velocity vector ($v_{new} = v - (1+e)(v \cdot n)n$), ensuring the sphere bounces realistically based on the restitution property.
 
-
-**Questions:**
